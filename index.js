@@ -17,18 +17,28 @@ app.use('/url', urlRoute) ;
 app.get("/:shortId", async (req, res) => {
     const shortId = req.params.shortId;
     const entry = await URL.findOneAndUpdate(
-      {
-        shortId,
-      },
-      {
-        $push: {
-          visitHistory: {
-            timestamp: Date.now(),
-          },
-        },
+      { shortID: shortId },
+            {
+                $push: {
+                    visitHistory: {
+                        timestamp: Date.now()
+                    }
+                }
+            },
+            
+        );
+    try {
+      if ( entry.redirectURL ) {
+        res.redirect(entry.redirectURL) ;
       }
-    );
-    return res.redirect(entry.redirectURL);
+      else {
+        res.json({"msg": "url not found."})
+      }
+    }
+    catch(err) {
+      console.error("error: " + err) 
+    }
+
   });
 
 
