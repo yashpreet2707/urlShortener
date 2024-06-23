@@ -6,10 +6,12 @@ async function handlegenerateNewShortURL(req,res) {
     const body = req.body ;
     if ( !body.url ) return res.status(400).json({error: "URL is required"})
 
-    const shortID = generateShortId() ;
+    const shortId = generateShortId() ;
     
+    console.log("shortid is generated :" + shortId)
+
     await URL.create({
-        shortID : shortID,
+        shortID : shortId,
         redirectURL : body.url,
         visitHistory: [],
     })
@@ -20,6 +22,10 @@ async function handlegenerateNewShortURL(req,res) {
 async function handleGetAnalytics( req,res) {
     const shortId = req.params.shortid ;
     const result = await URL.findOne({shortId}) ;
+
+    if ( !result ) {
+        return res.json({"mssg": "Not in database,"})
+    }
 
     return res.json({
         TotalClicks : result.visitHistory.length, analytics: result.visitHistory
